@@ -5,16 +5,28 @@ import (
 	"github.com/tomasen/realip"
 	"bytes"
 	"encoding/json"
+	"github.com/pkg/errors"
 )
 
 // TrackEndpoint defines the tracking URL castle.io side
 var TrackEndpoint = "https://api.castle.io/v1/track"
+var AuthentiacteEndpoint = "https://api.castle.io/v1/authenticate"
 
 // Event is an enum defining types of event castle tracks
 type Event string
 
 const (
 	EventLoginSucceeded Event = "$login.succeeded"
+)
+
+// AuthenticationRecommendedAction encapsulates the 3 possible responses from auth call (allow, challenge, deny)
+type AuthenticationRecommendedAction string
+
+const (
+	RecommendedActionNone AuthenticationRecommendedAction = ""
+	RecommendedActionAllow AuthenticationRecommendedAction = "allow"
+	RecommendedActionChallenge AuthenticationRecommendedAction = "challenge"
+	RecommendedActionDeny AuthenticationRecommendedAction = "deny"
 )
 
 // New creates a new castle client
@@ -37,8 +49,6 @@ type Castle struct {
 	client *http.Client
 	apiSecret string
 }
-
-//TODO PICK HEADERS FROM REQUEST
 
 type Context struct {
 	ClientID string
@@ -90,7 +100,7 @@ func ContextFromRequest(r *http.Request) *Context {
 	return &Context{ClientID: getClientID(r), IP: realip.FromRequest(r), Headers: headers}
 }
 
-type castleTrackRequest struct {
+type castleApiRequest struct {
 	Event Event	`json:"event"`
 	UserID string `json:"user_id"`
 	Context *Context `json:"context"`
@@ -98,43 +108,118 @@ type castleTrackRequest struct {
 	UserTraits map[string]string `json:"user_traits"`
 }
 
+type castleApiResponse struct {
+	Error string `json:"error"`
+	Type string `json:"type"`
+	Message  string `json:"message"`
+	Action string `json:"action"`
+	UserID string `json:"user_id"`
+	DeviceToken string `json:"device_token"`
+}
+
 // Track sends a tracking request to castle.io
 // see https://castle.io/docs/events for details
 func (c *Castle) Track(event Event, userID string, properties map[string]string, userTraits map[string]string, context *Context) (error) {
-
-	e := &castleTrackRequest{Event: event, UserID: userID, Context: context, Properties: properties, UserTraits: userTraits}
-	b := new(bytes.Buffer)
-	json.NewEncoder(b).Encode(e)
-
-	req, err := http.NewRequest(http.MethodPost, TrackEndpoint, b)
-	req.SetBasicAuth("", c.apiSecret)
-
-	if err != nil {
-		return err
-	}
-
-	_, err = c.client.Do(req)
-
-	return err
+	e := &castleApiRequest{Event: event, UserID: userID, Context: context, Properties: properties, UserTraits: userTraits}
+	return c.SendTrackCall(e)
 }
 
 // TrackSimple allows simple tracking of events into castle without specifying traits or properties
 func (c *Castle) TrackSimple(event Event, userID string, context *Context) error {
-	e := &castleTrackRequest{Event: event, UserID: userID, Context: context}
+	e := &castleApiRequest{Event: event, UserID: userID, Context: context}
+	return c.SendTrackCall(e)
+}
+
+// SendTrackCall is a plumbing method constructing the HTTP req/res and interpreting results
+func (c *Castle) SendTrackCall(e *castleApiRequest) (error) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(e)
 
 	req, err := http.NewRequest(http.MethodPost, TrackEndpoint, b)
 	req.SetBasicAuth("", c.apiSecret)
+	req.Header.Set("content-type", "application/json")
 
 	if err != nil {
 		return err
 	}
 
-	_, err = c.client.Do(req)
+	res, err := c.client.Do(req)
+
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusNoContent {
+		return errors.Errorf("expected 204 status but go %s", res.Status)
+	}
+
+	resp := &castleApiResponse{}
+
+	json.NewDecoder(res.Body).Decode(resp)
+
+	if resp.Error != "" {
+		//we have an api error
+		return errors.New(resp.Error)
+	}
 
 	return err
 }
 
+// Authenticate sends an authentication request to castle.io
+// see https://castle.io/docs/authentication for details
+func (c *Castle) Authenticate(event Event, userID string, properties map[string]string, userTraits map[string]string, context *Context) (AuthenticationRecommendedAction, error) {
+	e := &castleApiRequest{Event: event, UserID: userID, Context: context, Properties: properties, UserTraits: userTraits}
+	return c.SendAuthenticateCall(e)
+}
 
+// AuthenticateSimple allows authenticate call into castle without specifying traits or properties
+func (c *Castle) AuthenticateSimple(event Event, userID string, context *Context) (AuthenticationRecommendedAction, error) {
+	e := &castleApiRequest{Event: event, UserID: userID, Context: context}
+	return c.SendAuthenticateCall(e)
+}
 
+func authenticationRecommendedActionFromString(action string) AuthenticationRecommendedAction {
+	switch action {
+	case "allow": return RecommendedActionAllow
+	case "deny": return RecommendedActionDeny
+	case "challenge": return RecommendedActionChallenge
+	default:
+	return RecommendedActionNone
+	}
+}
+
+// SendAuthenticateCall is a plumbing method constructing the HTTP req/res and interpreting results
+func (c *Castle) SendAuthenticateCall(e *castleApiRequest) (AuthenticationRecommendedAction, error) {
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(e)
+
+	req, err := http.NewRequest(http.MethodPost, AuthentiacteEndpoint, b)
+	req.SetBasicAuth("", c.apiSecret)
+	req.Header.Set("content-type", "application/json")
+
+	if err != nil {
+		return RecommendedActionNone, err
+	}
+
+	res, err := c.client.Do(req)
+
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusCreated {
+		return RecommendedActionNone, errors.Errorf("expected 201 status but go %s", res.Status)
+	}
+
+	resp := &castleApiResponse{}
+
+	json.NewDecoder(res.Body).Decode(resp)
+
+	if resp.Error != "" {
+		//we have an api error
+		return RecommendedActionNone, errors.New(resp.Error)
+	}
+
+	if resp.Type != "" {
+		//we have an api error
+		return RecommendedActionNone, errors.Errorf("%s: %s", resp.Type, resp.Message)
+	}
+
+	return authenticationRecommendedActionFromString(resp.Action), err
+}
