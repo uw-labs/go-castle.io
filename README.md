@@ -47,7 +47,7 @@ decision, err := castle.Authenticate(
 		castleio.EventLoginSucceeded,
 		"md-1",
 		map[string]string{"prop1": "propValue1"},
-        map[string]string{"trait1": "traitValue1"},
+		map[string]string{"trait1": "traitValue1"},
 		castleio.ContextFromRequest(req),
 	)
 ```
