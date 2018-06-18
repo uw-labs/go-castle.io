@@ -21,14 +21,14 @@ const (
 	EventLoginFailed Event = "$login.failed"
 	EventPasswordResetRequestSucceeded Event = "$password_reset_request.succeeded"
 	EventPasswordResetRequestFailed Event = "$password_reset_request.failed"
-	EventPasswordResetSucceeded = "$password_reset.succeeded"
-	EventPasswordResetFailed = "$password_reset.failed"
-	EventIncidentMitigated = "$incident.mitigated"
-	EventReviewResolved = "$review.resolved"
-	EventReviewEscalated = "$review.escalated"
-	EventChallengeRequested = "$challenge.requested"
-	EventChallengeSucceeded = "$challenge.succeeded"
-	EventChallengeFailed = "$challenge.failed"
+	EventPasswordResetSucceeded Event = "$password_reset.succeeded"
+	EventPasswordResetFailed Event = "$password_reset.failed"
+	EventIncidentMitigated Event = "$incident.mitigated"
+	EventReviewResolved Event = "$review.resolved"
+	EventReviewEscalated Event = "$review.escalated"
+	EventChallengeRequested Event = "$challenge.requested"
+	EventChallengeSucceeded Event = "$challenge.succeeded"
+	EventChallengeFailed Event = "$challenge.failed"
 )
 
 // AuthenticationRecommendedAction encapsulates the 3 possible responses from auth call (allow, challenge, deny)
