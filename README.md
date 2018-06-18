@@ -1,6 +1,6 @@
 # go-castle.io
 
-go-castle.io is a go library wrapping https://castle.io tracking API.
+go-castle.io is a go library wrapping https://castle.io API.
 
 ## Install
 
@@ -33,7 +33,11 @@ func main() {
 
 		// authenticate user then track with castle
 
-		err := castle.TrackSimple(castleio.EventLoginSucceeded, "user-123", castleio.ContextFromRequest(r))
+		err := castle.TrackSimple(
+		    castleio.EventLoginSucceeded,
+		    "user-123",
+		    castleio.ContextFromRequest(r)
+        )
 
 		if err != nil {
 			log.Println(err)
