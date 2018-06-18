@@ -251,7 +251,7 @@ func TestCastle_Authenticate(t *testing.T) {
 		executed = true
 	}))
 
-	castleio.AuthentiacteEndpoint = ts.URL
+	castleio.AuthenticateEndpoint = ts.URL
 
 	castle.Authenticate(
 		castleio.EventLoginSucceeded,
@@ -298,7 +298,7 @@ func TestCastle_AuthenticateSimple(t *testing.T) {
 		executed = true
 	}))
 
-	castleio.AuthentiacteEndpoint = ts.URL
+	castleio.AuthenticateEndpoint = ts.URL
 
 	castle.AuthenticateSimple(
 		castleio.EventLoginSucceeded,
@@ -320,7 +320,7 @@ func TestCastle_SendAuthenticateCall(t *testing.T) {
 		w.Write([]byte(`{"error": "this is an error"}`))
 	}))
 
-	castleio.AuthentiacteEndpoint = ts.URL
+	castleio.AuthenticateEndpoint = ts.URL
 
 	res, err := castle.Authenticate(
 		castleio.EventLoginSucceeded,
@@ -338,7 +338,7 @@ func TestCastle_SendAuthenticateCall(t *testing.T) {
 		w.WriteHeader(400)
 	}))
 
-	castleio.AuthentiacteEndpoint = ts.URL
+	castleio.AuthenticateEndpoint = ts.URL
 
 	res, err = castle.Authenticate(
 		castleio.EventLoginSucceeded,
@@ -356,7 +356,7 @@ func TestCastle_SendAuthenticateCall(t *testing.T) {
 		w.Write([]byte(`{"type": "invalid_parameter", "message": "error message"}`))
 	}))
 
-	castleio.AuthentiacteEndpoint = ts.URL
+	castleio.AuthenticateEndpoint = ts.URL
 
 	res, err = castle.Authenticate(
 		castleio.EventLoginSucceeded,
@@ -375,7 +375,7 @@ func TestCastle_SendAuthenticateCall(t *testing.T) {
 		w.Write([]byte(`{"action": "allow"}`))
 	}))
 
-	castleio.AuthentiacteEndpoint = ts.URL
+	castleio.AuthenticateEndpoint = ts.URL
 
 	res, err = castle.Authenticate(
 		castleio.EventLoginSucceeded,
@@ -394,7 +394,7 @@ func TestCastle_SendAuthenticateCall(t *testing.T) {
 		w.Write([]byte(`{"action": "challenge"}`))
 	}))
 
-	castleio.AuthentiacteEndpoint = ts.URL
+	castleio.AuthenticateEndpoint = ts.URL
 
 	res, err = castle.Authenticate(
 		castleio.EventLoginSucceeded,
@@ -413,7 +413,7 @@ func TestCastle_SendAuthenticateCall(t *testing.T) {
 		w.Write([]byte(`{"action": "deny"}`))
 	}))
 
-	castleio.AuthentiacteEndpoint = ts.URL
+	castleio.AuthenticateEndpoint = ts.URL
 
 	res, err = castle.Authenticate(
 		castleio.EventLoginSucceeded,

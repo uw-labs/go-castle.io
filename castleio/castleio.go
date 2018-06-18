@@ -10,12 +10,14 @@ import (
 
 // TrackEndpoint defines the tracking URL castle.io side
 var TrackEndpoint = "https://api.castle.io/v1/track"
-var AuthentiacteEndpoint = "https://api.castle.io/v1/authenticate"
+
+// AuthenticateEndpoint defines the adaptive authentication URL castle.io side
+var AuthenticateEndpoint = "https://api.castle.io/v1/authenticate"
 
 // Event is an enum defining types of event castle tracks
-// see https://castle.io/docs/events
 type Event string
 
+// See https://castle.io/docs/events
 const (
 	EventLoginSucceeded Event = "$login.succeeded"
 	EventLoginFailed Event = "$login.failed"
@@ -34,6 +36,7 @@ const (
 // AuthenticationRecommendedAction encapsulates the 3 possible responses from auth call (allow, challenge, deny)
 type AuthenticationRecommendedAction string
 
+// See https://castle.io/docs/authentication
 const (
 	RecommendedActionNone AuthenticationRecommendedAction = ""
 	RecommendedActionAllow AuthenticationRecommendedAction = "allow"
@@ -203,7 +206,7 @@ func (c *Castle) SendAuthenticateCall(e *castleApiRequest) (AuthenticationRecomm
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(e)
 
-	req, err := http.NewRequest(http.MethodPost, AuthentiacteEndpoint, b)
+	req, err := http.NewRequest(http.MethodPost, AuthenticateEndpoint, b)
 	req.SetBasicAuth("", c.apiSecret)
 	req.Header.Set("content-type", "application/json")
 
