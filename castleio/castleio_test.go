@@ -1,12 +1,12 @@
 package castleio_test
 
 import (
-	"testing"
-	"net/http"
-	"github.com/utilitywarehouse/go-castle.io/castleio"
-	"github.com/stretchr/testify/assert"
-	"net/http/httptest"
 	"encoding/json"
+	"github.com/stretchr/testify/assert"
+	"github.com/utilitywarehouse/go-castle.io/castleio"
+	"net/http"
+	"net/http/httptest"
+	"testing"
 )
 
 func configureRequest() *http.Request {
@@ -87,9 +87,9 @@ func TestCastle_Track(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		type castleTrackRequest struct {
-			Event castleio.Event	`json:"event"`
-			UserID string `json:"user_id"`
-			Context *castleio.Context `json:"context"`
+			Event      castleio.Event    `json:"event"`
+			UserID     string            `json:"user_id"`
+			Context    *castleio.Context `json:"context"`
 			Properties map[string]string `json:"properties"`
 			UserTraits map[string]string `json:"user_traits"`
 		}
@@ -137,8 +137,8 @@ func TestCastle_TrackSimple(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		type castleTrackRequest struct {
-			Event castleio.Event	`json:"event"`
-			UserID string `json:"user_id"`
+			Event   castleio.Event    `json:"event"`
+			UserID  string            `json:"user_id"`
 			Context *castleio.Context `json:"context"`
 		}
 
@@ -175,7 +175,7 @@ func TestContextFromRequest(t *testing.T) {
 	// grabs ClientID form cookie
 	req := httptest.NewRequest("GET", "/", nil)
 	req.AddCookie(&http.Cookie{
-		Name: "__cid",
+		Name:  "__cid",
 		Value: "__cid_value",
 	})
 
@@ -201,7 +201,7 @@ func TestContextFromRequest(t *testing.T) {
 	// grabs whitelisted headers only
 
 	for _, whitelistedHeader := range castleio.HeaderWhitelist {
-		req.Header.Set(whitelistedHeader, whitelistedHeader )
+		req.Header.Set(whitelistedHeader, whitelistedHeader)
 	}
 
 	ctx = castleio.ContextFromRequest(req)
@@ -212,7 +212,6 @@ func TestContextFromRequest(t *testing.T) {
 	assert.NotContains(t, ctx.Headers, "Cookie")
 
 }
-
 
 func TestCastle_Authenticate(t *testing.T) {
 
@@ -225,9 +224,9 @@ func TestCastle_Authenticate(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		type castleAuthenticateRequest struct {
-			Event castleio.Event	`json:"event"`
-			UserID string `json:"user_id"`
-			Context *castleio.Context `json:"context"`
+			Event      castleio.Event    `json:"event"`
+			UserID     string            `json:"user_id"`
+			Context    *castleio.Context `json:"context"`
 			Properties map[string]string `json:"properties"`
 			UserTraits map[string]string `json:"user_traits"`
 		}
@@ -276,8 +275,8 @@ func TestCastle_AuthenticateSimple(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		type castleAuthenticateRequest struct {
-			Event castleio.Event	`json:"event"`
-			UserID string `json:"user_id"`
+			Event   castleio.Event    `json:"event"`
+			UserID  string            `json:"user_id"`
 			Context *castleio.Context `json:"context"`
 		}
 
