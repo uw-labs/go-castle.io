@@ -17,3 +17,6 @@ ifdef LEXC
 else
 	$(LINTER) $(LINT_FLAGS) ./castleio/...
 endif
+
+test:
+	go test ./castleio/...
