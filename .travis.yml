@@ -6,4 +6,4 @@ go:
   - "1.10.x"
   - master
 
-script: make lint test
+script: make install lint test

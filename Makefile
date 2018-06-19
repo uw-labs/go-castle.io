@@ -20,3 +20,6 @@ endif
 
 test:
 	go test ./castleio/...
+
+install:
+	go get -t ./castleio/...
