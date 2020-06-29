@@ -1,4 +1,4 @@
-package castleio
+package castle
 
 import (
 	"bytes"
