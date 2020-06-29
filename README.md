@@ -1,11 +1,11 @@
-# go-castle.io [![Build Status](https://travis-ci.org/uw-labs/go-castle.io.svg?branch=master)](https://travis-ci.org/uw-labs/go-castle.io)
+# castle-go
 
-go-castle.io is a go library wrapping https://castle.io API.
+castle-go  is a go library wrapping https://castle.io API.
 
 ## Install
 
 ```
-go get github.com/utilitywarehouse/go-castle.io
+go get github.com/castle/castle-go
 ```
 
 ## Usage
@@ -58,7 +58,7 @@ decision, err := castle.Authenticate(
 package main
 
 import (
-	"github.com/utilitywarehouse/go-castle.io/castle"
+	"github.com/castle/castle-go /castle"
 	"net/http"
 	"log"
 )
