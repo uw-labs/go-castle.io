@@ -3,9 +3,11 @@ package castleio
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/pkg/errors"
-	"github.com/tomasen/realip"
+	"errors"
+	"fmt"
 	"net/http"
+
+	"github.com/tomasen/realip"
 )
 
 // TrackEndpoint defines the tracking URL castle.io side
@@ -73,7 +75,6 @@ type Context struct {
 }
 
 func getClientID(r *http.Request) string {
-
 	var clientID string
 
 	// ClientID is __cid cookie or X-Castle-Client-Id header
@@ -104,7 +105,6 @@ func isHeaderWhitelisted(header string) bool {
 
 // ContextFromRequest builds castle context from current http.Request
 func ContextFromRequest(r *http.Request) *Context {
-
 	headers := make(map[string]string)
 
 	for requestHeader := range r.Header {
@@ -116,7 +116,7 @@ func ContextFromRequest(r *http.Request) *Context {
 	return &Context{ClientID: getClientID(r), IP: realip.FromRequest(r), Headers: headers}
 }
 
-type castleAPIRequest struct {
+type CastleAPIRequest struct {
 	Event      Event             `json:"event"`
 	UserID     string            `json:"user_id"`
 	Context    *Context          `json:"context"`
@@ -136,23 +136,24 @@ type castleAPIResponse struct {
 // Track sends a tracking request to castle.io
 // see https://castle.io/docs/events for details
 func (c *Castle) Track(event Event, userID string, properties map[string]string, userTraits map[string]string, context *Context) error {
-	e := &castleAPIRequest{Event: event, UserID: userID, Context: context, Properties: properties, UserTraits: userTraits}
+	e := &CastleAPIRequest{Event: event, UserID: userID, Context: context, Properties: properties, UserTraits: userTraits}
 	return c.SendTrackCall(e)
 }
 
 // TrackSimple allows simple tracking of events into castle without specifying traits or properties
 func (c *Castle) TrackSimple(event Event, userID string, context *Context) error {
-	e := &castleAPIRequest{Event: event, UserID: userID, Context: context}
+	e := &CastleAPIRequest{Event: event, UserID: userID, Context: context}
 	return c.SendTrackCall(e)
 }
 
 // SendTrackCall is a plumbing method constructing the HTTP req/res and interpreting results
-func (c *Castle) SendTrackCall(e *castleAPIRequest) error {
-	b := new(bytes.Buffer)
-	json.NewEncoder(b).Encode(e)
+func (c *Castle) SendTrackCall(e *CastleAPIRequest) error {
+	var body bytes.Buffer
+	if err := json.NewEncoder(&body).Encode(e); err != nil {
+		return fmt.Errorf("failed encoding api request: %w", err)
+	}
 
-	req, err := http.NewRequest(http.MethodPost, TrackEndpoint, b)
-
+	req, err := http.NewRequest(http.MethodPost, TrackEndpoint, &body)
 	if err != nil {
 		return err
 	}
@@ -161,7 +162,6 @@ func (c *Castle) SendTrackCall(e *castleAPIRequest) error {
 	req.Header.Set("content-type", "application/json")
 
 	res, err := c.client.Do(req)
-
 	if err != nil {
 		return err
 	}
@@ -169,31 +169,32 @@ func (c *Castle) SendTrackCall(e *castleAPIRequest) error {
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusNoContent {
-		return errors.Errorf("expected 204 status but go %s", res.Status)
+		return fmt.Errorf("expected %s but got %s", http.StatusText(http.StatusNoContent), res.Status)
 	}
 
-	resp := &castleAPIResponse{}
+	var resp castleAPIResponse
+
+	if err := json.NewDecoder(res.Body).Decode(&resp); err != nil {
+		return fmt.Errorf("failed decoding response body: %w", err)
+	}
 
 	if resp.Error != "" {
 		//we have an api error
 		return errors.New(resp.Error)
 	}
 
-	json.NewDecoder(res.Body).Decode(resp)
-
 	return err
 }
 
 // Authenticate sends an authentication request to castle.io
 // see https://castle.io/docs/authentication for details
-func (c *Castle) Authenticate(event Event, userID string, properties map[string]string, userTraits map[string]string, context *Context) (AuthenticationRecommendedAction, error) {
-	e := &castleAPIRequest{Event: event, UserID: userID, Context: context, Properties: properties, UserTraits: userTraits}
-	return c.SendAuthenticateCall(e)
+func (c *Castle) Authenticate(apiRequest CastleAPIRequest) (AuthenticationRecommendedAction, error) {
+	return c.SendAuthenticateCall(&apiRequest)
 }
 
 // AuthenticateSimple allows authenticate call into castle without specifying traits or properties
 func (c *Castle) AuthenticateSimple(event Event, userID string, context *Context) (AuthenticationRecommendedAction, error) {
-	e := &castleAPIRequest{Event: event, UserID: userID, Context: context}
+	e := &CastleAPIRequest{Event: event, UserID: userID, Context: context}
 	return c.SendAuthenticateCall(e)
 }
 
@@ -211,12 +212,13 @@ func authenticationRecommendedActionFromString(action string) AuthenticationReco
 }
 
 // SendAuthenticateCall is a plumbing method constructing the HTTP req/res and interpreting results
-func (c *Castle) SendAuthenticateCall(e *castleAPIRequest) (AuthenticationRecommendedAction, error) {
-	b := new(bytes.Buffer)
-	json.NewEncoder(b).Encode(e)
+func (c *Castle) SendAuthenticateCall(e *CastleAPIRequest) (AuthenticationRecommendedAction, error) {
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(e); err != nil {
+		return RecommendedActionNone, fmt.Errorf("faled encoding request body: %w", err)
+	}
 
-	req, err := http.NewRequest(http.MethodPost, AuthenticateEndpoint, b)
-
+	req, err := http.NewRequest(http.MethodPost, AuthenticateEndpoint, &buf)
 	if err != nil {
 		return RecommendedActionNone, err
 	}
@@ -225,7 +227,6 @@ func (c *Castle) SendAuthenticateCall(e *castleAPIRequest) (AuthenticationRecomm
 	req.Header.Set("content-type", "application/json")
 
 	res, err := c.client.Do(req)
-
 	if err != nil {
 		return RecommendedActionNone, err
 	}
@@ -233,27 +234,23 @@ func (c *Castle) SendAuthenticateCall(e *castleAPIRequest) (AuthenticationRecomm
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusCreated {
-		return RecommendedActionNone, errors.Errorf("expected 201 status but go %s", res.Status)
+		return RecommendedActionNone, fmt.Errorf("expected %s but got: %s", http.StatusText(http.StatusCreated), res.Status)
 	}
 
-	resp := &castleAPIResponse{}
+	var resp castleAPIResponse
 
-	json.NewDecoder(res.Body).Decode(resp)
+	if err := json.NewDecoder(res.Body).Decode(&resp); err != nil {
+		return RecommendedActionNone, fmt.Errorf("failed reading body: %w", err)
+	}
 
 	if resp.Error != "" {
-		//we have an api error
 		return RecommendedActionNone, errors.New(resp.Error)
 	}
 
+	// missing type is an erroneous state.
 	if resp.Type != "" {
-		//we have an api error
-		return RecommendedActionNone, errors.Errorf("%s: %s", resp.Type, resp.Message)
+		return RecommendedActionNone, fmt.Errorf("%s: %s", resp.Type, resp.Message)
 	}
 
 	return authenticationRecommendedActionFromString(resp.Action), err
-}
-
-// WebhookBody encapsulates body of webhook notificationc coming from castle.io
-// see https://castle.io/docs/webhooks
-type WebhookBody struct {
 }
