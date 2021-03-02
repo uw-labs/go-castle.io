@@ -2,11 +2,12 @@ package castleio_test
 
 import (
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
-	"github.com/utilitywarehouse/go-castle.io/castleio"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/utilitywarehouse/go-castle.io/castleio"
 )
 
 func configureRequest() *http.Request {
@@ -102,7 +103,9 @@ func TestCastle_Track(t *testing.T) {
 		assert.Equal(t, password, "secret-string")
 		assert.True(t, ok)
 
-		json.NewDecoder(r.Body).Decode(reqData)
+		if err := json.NewDecoder(r.Body).Decode(reqData); err != nil {
+			t.Error(err)
+		}
 
 		assert.Equal(t, castleio.EventLoginSucceeded, reqData.Event)
 		assert.Equal(t, "user-id", reqData.UserID)
@@ -115,7 +118,7 @@ func TestCastle_Track(t *testing.T) {
 
 	castleio.TrackEndpoint = ts.URL
 
-	castle.Track(
+	_ = castle.Track(
 		castleio.EventLoginSucceeded,
 		"user-id",
 		map[string]string{"prop1": "propValue1"},
@@ -150,7 +153,9 @@ func TestCastle_TrackSimple(t *testing.T) {
 		assert.Equal(t, password, "secret-string")
 		assert.True(t, ok)
 
-		json.NewDecoder(r.Body).Decode(reqData)
+		if err := json.NewDecoder(r.Body).Decode(reqData); err != nil {
+			t.Error(err)
+		}
 
 		assert.Equal(t, castleio.EventLoginSucceeded, reqData.Event)
 		assert.Equal(t, "user-id", reqData.UserID)
@@ -161,7 +166,7 @@ func TestCastle_TrackSimple(t *testing.T) {
 
 	castleio.TrackEndpoint = ts.URL
 
-	castle.TrackSimple(
+	_ = castle.TrackSimple(
 		castleio.EventLoginSucceeded,
 		"user-id",
 		castleio.ContextFromRequest(req),
@@ -239,7 +244,9 @@ func TestCastle_Authenticate(t *testing.T) {
 		assert.Equal(t, password, "secret-string")
 		assert.True(t, ok)
 
-		json.NewDecoder(r.Body).Decode(reqData)
+		if err := json.NewDecoder(r.Body).Decode(reqData); err != nil {
+			t.Error(err)
+		}
 
 		assert.Equal(t, castleio.EventLoginSucceeded, reqData.Event)
 		assert.Equal(t, "user-id", reqData.UserID)
@@ -252,7 +259,7 @@ func TestCastle_Authenticate(t *testing.T) {
 
 	castleio.AuthenticateEndpoint = ts.URL
 
-	castle.Authenticate(
+	_, _ = castle.Authenticate(
 		castleio.EventLoginSucceeded,
 		"user-id",
 		map[string]string{"prop1": "propValue1"},
@@ -288,7 +295,9 @@ func TestCastle_AuthenticateSimple(t *testing.T) {
 		assert.Equal(t, password, "secret-string")
 		assert.True(t, ok)
 
-		json.NewDecoder(r.Body).Decode(reqData)
+		if err := json.NewDecoder(r.Body).Decode(reqData); err != nil {
+			t.Error(err)
+		}
 
 		assert.Equal(t, castleio.EventLoginSucceeded, reqData.Event)
 		assert.Equal(t, "user-id", reqData.UserID)
@@ -299,7 +308,7 @@ func TestCastle_AuthenticateSimple(t *testing.T) {
 
 	castleio.AuthenticateEndpoint = ts.URL
 
-	castle.AuthenticateSimple(
+	_, _ = castle.AuthenticateSimple(
 		castleio.EventLoginSucceeded,
 		"user-id",
 		castleio.ContextFromRequest(req),

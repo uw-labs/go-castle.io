@@ -1,25 +1,18 @@
-LINT_FLAGS :=--disable-all --enable=vet --enable=vetshadow --enable=golint --enable=ineffassign --enable=goconst --enable=gofmt
-LINTER_EXE := gometalinter.v1
-LINTER := $(GOPATH)/bin/$(LINTER_EXE)
-
-LEXC :=
-ifdef LINT_EXCLUDE
-	LEXC := $(call join-with,|,$(LINT_EXCLUDE))
-endif
-
-$(LINTER):
-	go get -u gopkg.in/alecthomas/$(LINTER_EXE)
-	$(LINTER) --install
-
-lint: $(LINTER)
-ifdef LEXC
-	$(LINTER) --exclude '$(LEXC)' $(LINT_FLAGS) ./castleio/...
-else
-	$(LINTER) $(LINT_FLAGS) ./castleio/...
-endif
+lint:
+	docker run --rm -v ${PWD}:/app -w /app golangci/golangci-lint:v1.37.1 golangci-lint run -v \
+	-E gosec \
+	-E misspell \
+	-E maligned \
+	-E interfacer \
+	-E goconst \
+	-E sqlclosecheck \
+	-E rowserrcheck \
+	-E gomnd \
+	-E bodyclose \
+	-e w.Write
 
 test:
 	go test ./castleio/...
 
 install:
-	go get -t ./castleio/...
+	go mod download 
