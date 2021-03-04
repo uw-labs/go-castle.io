@@ -5,7 +5,7 @@ go-castle.io is a go library wrapping https://castle.io API.
 ## Install
 
 ```
-go get github.com/utilitywarehouse/go-castle.io
+go get github.com/utilitywarehouse/go-castle.io/castleio
 ```
 
 ## Usage
