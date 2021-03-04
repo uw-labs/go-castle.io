@@ -83,7 +83,7 @@ func TestCastle_Track(t *testing.T) {
 
 	castle, _ := castleio.New("secret-string")
 
-	var executed = false
+	executed := false
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
@@ -127,7 +127,6 @@ func TestCastle_Track(t *testing.T) {
 	)
 
 	assert.True(t, executed)
-
 }
 
 func TestCastle_TrackSimple(t *testing.T) {
@@ -135,7 +134,7 @@ func TestCastle_TrackSimple(t *testing.T) {
 
 	castle, _ := castleio.New("secret-string")
 
-	var executed = false
+	executed := false
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
@@ -224,7 +223,7 @@ func TestCastle_Authenticate(t *testing.T) {
 
 	castle, _ := castleio.New("secret-string")
 
-	var executed = false
+	executed := false
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
@@ -277,7 +276,7 @@ func TestCastle_AuthenticateSimple(t *testing.T) {
 
 	castle, _ := castleio.New("secret-string")
 
-	var executed = false
+	executed := false
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
