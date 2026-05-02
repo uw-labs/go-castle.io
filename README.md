@@ -1,4 +1,4 @@
-# go-castle.io [![Build Status](https://travis-ci.org/uw-labs/go-castle.io.svg?branch=master)](https://travis-ci.org/uw-labs/go-castle.io)
+# go-castle.io [![CI](https://github.com/uw-labs/go-castle.io/actions/workflows/ci.yml/badge.svg)](https://github.com/uw-labs/go-castle.io/actions/workflows/ci.yml)
 
 go-castle.io is a go library wrapping https://castle.io API.
 

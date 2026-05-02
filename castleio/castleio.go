@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 
 	"github.com/tomasen/realip"
@@ -166,7 +167,11 @@ func (c *Castle) SendTrackCall(e *CastleAPIRequest) error {
 		return err
 	}
 
-	defer res.Body.Close()
+	defer func() {
+		if err = res.Body.Close(); err != nil {
+			slog.Error("failed to close response body", "error", err)
+		}
+	}()
 
 	if res.StatusCode != http.StatusNoContent {
 		return fmt.Errorf("expected %s but got %s", http.StatusText(http.StatusNoContent), res.Status)
@@ -220,7 +225,11 @@ func (c *Castle) SendAuthenticateCall(e *CastleAPIRequest) (AuthenticationRecomm
 		return RecommendedActionNone, err
 	}
 
-	defer res.Body.Close()
+	defer func() {
+		if err = res.Body.Close(); err != nil {
+			slog.Error("failed to close response body", "error", err)
+		}
+	}()
 
 	if res.StatusCode != http.StatusCreated {
 		return RecommendedActionNone, fmt.Errorf("expected %s but got: %s", http.StatusText(http.StatusCreated), res.Status)
