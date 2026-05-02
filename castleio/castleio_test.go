@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/utilitywarehouse/go-castle.io/castleio"
+	"github.com/uw-labs/go-castle.io/castleio"
 )
 
 func configureRequest() *http.Request {
@@ -260,11 +260,13 @@ func TestCastle_Authenticate(t *testing.T) {
 	castleio.AuthenticateEndpoint = ts.URL
 
 	_, _ = castle.Authenticate(
-		castleio.EventLoginSucceeded,
-		"user-id",
-		map[string]string{"prop1": "propValue1"},
-		map[string]string{"trait1": "traitValue1"},
-		castleio.ContextFromRequest(req),
+		castleio.CastleAPIRequest{
+			Event:      castleio.EventLoginSucceeded,
+			UserID:     "user-id",
+			Properties: map[string]string{"prop1": "propValue1"},
+			UserTraits: map[string]string{"trait1": "traitValue1"},
+			Context:    castleio.ContextFromRequest(req),
+		},
 	)
 
 	assert.True(t, executed)
@@ -331,11 +333,13 @@ func TestCastle_SendAuthenticateCall(t *testing.T) {
 	castleio.AuthenticateEndpoint = ts.URL
 
 	res, err := castle.Authenticate(
-		castleio.EventLoginSucceeded,
-		"user-id",
-		map[string]string{"prop1": "propValue1"},
-		map[string]string{"trait1": "traitValue1"},
-		castleio.ContextFromRequest(req),
+		castleio.CastleAPIRequest{
+			Event:      castleio.EventLoginSucceeded,
+			UserID:     "user-id",
+			Properties: map[string]string{"prop1": "propValue1"},
+			UserTraits: map[string]string{"trait1": "traitValue1"},
+			Context:    castleio.ContextFromRequest(req),
+		},
 	)
 
 	assert.Error(t, err)
@@ -349,11 +353,13 @@ func TestCastle_SendAuthenticateCall(t *testing.T) {
 	castleio.AuthenticateEndpoint = ts.URL
 
 	res, err = castle.Authenticate(
-		castleio.EventLoginSucceeded,
-		"user-id",
-		map[string]string{"prop1": "propValue1"},
-		map[string]string{"trait1": "traitValue1"},
-		castleio.ContextFromRequest(req),
+		castleio.CastleAPIRequest{
+			Event:      castleio.EventLoginSucceeded,
+			UserID:     "user-id",
+			Properties: map[string]string{"prop1": "propValue1"},
+			UserTraits: map[string]string{"trait1": "traitValue1"},
+			Context:    castleio.ContextFromRequest(req),
+		},
 	)
 
 	assert.Error(t, err)
@@ -367,11 +373,13 @@ func TestCastle_SendAuthenticateCall(t *testing.T) {
 	castleio.AuthenticateEndpoint = ts.URL
 
 	res, err = castle.Authenticate(
-		castleio.EventLoginSucceeded,
-		"user-id",
-		map[string]string{"prop1": "propValue1"},
-		map[string]string{"trait1": "traitValue1"},
-		castleio.ContextFromRequest(req),
+		castleio.CastleAPIRequest{
+			Event:      castleio.EventLoginSucceeded,
+			UserID:     "user-id",
+			Properties: map[string]string{"prop1": "propValue1"},
+			UserTraits: map[string]string{"trait1": "traitValue1"},
+			Context:    castleio.ContextFromRequest(req),
+		},
 	)
 
 	assert.Error(t, err)
@@ -386,11 +394,13 @@ func TestCastle_SendAuthenticateCall(t *testing.T) {
 	castleio.AuthenticateEndpoint = ts.URL
 
 	res, err = castle.Authenticate(
-		castleio.EventLoginSucceeded,
-		"user-id",
-		map[string]string{"prop1": "propValue1"},
-		map[string]string{"trait1": "traitValue1"},
-		castleio.ContextFromRequest(req),
+		castleio.CastleAPIRequest{
+			Event:      castleio.EventLoginSucceeded,
+			UserID:     "user-id",
+			Properties: map[string]string{"prop1": "propValue1"},
+			UserTraits: map[string]string{"trait1": "traitValue1"},
+			Context:    castleio.ContextFromRequest(req),
+		},
 	)
 
 	assert.NoError(t, err)
@@ -405,11 +415,13 @@ func TestCastle_SendAuthenticateCall(t *testing.T) {
 	castleio.AuthenticateEndpoint = ts.URL
 
 	res, err = castle.Authenticate(
-		castleio.EventLoginSucceeded,
-		"user-id",
-		map[string]string{"prop1": "propValue1"},
-		map[string]string{"trait1": "traitValue1"},
-		castleio.ContextFromRequest(req),
+		castleio.CastleAPIRequest{
+			Event:      castleio.EventLoginSucceeded,
+			UserID:     "user-id",
+			Properties: map[string]string{"prop1": "propValue1"},
+			UserTraits: map[string]string{"trait1": "traitValue1"},
+			Context:    castleio.ContextFromRequest(req),
+		},
 	)
 
 	assert.NoError(t, err)
@@ -424,11 +436,13 @@ func TestCastle_SendAuthenticateCall(t *testing.T) {
 	castleio.AuthenticateEndpoint = ts.URL
 
 	res, err = castle.Authenticate(
-		castleio.EventLoginSucceeded,
-		"user-id",
-		map[string]string{"prop1": "propValue1"},
-		map[string]string{"trait1": "traitValue1"},
-		castleio.ContextFromRequest(req),
+		castleio.CastleAPIRequest{
+			Event:      castleio.EventLoginSucceeded,
+			UserID:     "user-id",
+			Properties: map[string]string{"prop1": "propValue1"},
+			UserTraits: map[string]string{"trait1": "traitValue1"},
+			Context:    castleio.ContextFromRequest(req),
+		},
 	)
 
 	assert.NoError(t, err)

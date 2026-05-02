@@ -172,18 +172,7 @@ func (c *Castle) SendTrackCall(e *CastleAPIRequest) error {
 		return fmt.Errorf("expected %s but got %s", http.StatusText(http.StatusNoContent), res.Status)
 	}
 
-	var resp castleAPIResponse
-
-	if err := json.NewDecoder(res.Body).Decode(&resp); err != nil {
-		return fmt.Errorf("failed decoding response body: %w", err)
-	}
-
-	if resp.Error != "" {
-		//we have an api error
-		return errors.New(resp.Error)
-	}
-
-	return err
+	return nil
 }
 
 // Authenticate sends an authentication request to castle.io
