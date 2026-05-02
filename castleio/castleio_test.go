@@ -27,7 +27,7 @@ func TestCastle_SendTrackCall(t *testing.T) {
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("content-type", "application/json")
-		w.Write([]byte(`{"error": "this is an error"}`))
+		w.Write([]byte(`{"error": "this is an error"}`)) //nolint:errcheck
 	}))
 
 	castleio.TrackEndpoint = ts.URL
@@ -325,7 +325,7 @@ func TestCastle_SendAuthenticateCall(t *testing.T) {
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("content-type", "application/json")
-		w.Write([]byte(`{"error": "this is an error"}`))
+		w.Write([]byte(`{"error": "this is an error"}`)) //nolint:errcheck
 	}))
 
 	castleio.AuthenticateEndpoint = ts.URL
@@ -361,7 +361,7 @@ func TestCastle_SendAuthenticateCall(t *testing.T) {
 
 	ts = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("content-type", "application/json")
-		w.Write([]byte(`{"type": "invalid_parameter", "message": "error message"}`))
+		w.Write([]byte(`{"type": "invalid_parameter", "message": "error message"}`)) //nolint:errcheck
 	}))
 
 	castleio.AuthenticateEndpoint = ts.URL
@@ -380,7 +380,7 @@ func TestCastle_SendAuthenticateCall(t *testing.T) {
 	ts = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("content-type", "application/json")
 		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte(`{"action": "allow"}`))
+		w.Write([]byte(`{"action": "allow"}`)) //nolint:errcheck
 	}))
 
 	castleio.AuthenticateEndpoint = ts.URL
@@ -399,7 +399,7 @@ func TestCastle_SendAuthenticateCall(t *testing.T) {
 	ts = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("content-type", "application/json")
 		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte(`{"action": "challenge"}`))
+		w.Write([]byte(`{"action": "challenge"}`)) //nolint:errcheck
 	}))
 
 	castleio.AuthenticateEndpoint = ts.URL
@@ -418,7 +418,7 @@ func TestCastle_SendAuthenticateCall(t *testing.T) {
 	ts = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("content-type", "application/json")
 		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte(`{"action": "deny"}`))
+		w.Write([]byte(`{"action": "deny"}`)) //nolint:errcheck
 	}))
 
 	castleio.AuthenticateEndpoint = ts.URL
